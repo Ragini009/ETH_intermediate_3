@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.13;
+
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.0.0/contracts/token/ERC20/ERC20.sol";
+
+contract ModifiedErc20 is ERC20 {
+    address public admin;
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can call this function");
+        _;
+    }
+
+    constructor(uint256 initialTokens) ERC20("RagToken", "RTK") {
+        admin = msg.sender;
+        _mint(admin, initialTokens * 10 ** uint256(decimals()));
+    }
+
+    function mint(address recipient, uint256 tokenAmount) public onlyAdmin {
+        _mint(recipient, tokenAmount * 10 ** uint256(decimals()));
+    }
+
+    function burn(uint256 tokenAmount) public {
+        _burn(msg.sender, tokenAmount * 10 ** uint256(decimals()));
+    }
+
+    function sendTokens(address recipient, uint256 tokenAmount) public returns (bool) {
+        return transfer(recipient, tokenAmount * 10 ** uint256(decimals()));
+    }
+}
